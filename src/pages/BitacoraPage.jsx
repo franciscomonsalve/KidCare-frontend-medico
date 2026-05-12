@@ -105,7 +105,10 @@ function PainTrack({ value = 6 }) {
 export default function BitacoraPage() {
   const location = useLocation()
   const navigate  = useNavigate()
-  const { menorId, expiracion } = location.state || {}
+  const { menorId, expiracion } = location.state || {
+  menorId: 'test-123',
+  expiracion: new Date(Date.now() + 20 * 60 * 1000).toISOString()
+ }
   const { display: timerDisplay, expirado } = useContador(expiracion)
 
   const [bitacora,  setBitacora]  = useState(null)

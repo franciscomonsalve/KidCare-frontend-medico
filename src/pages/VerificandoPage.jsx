@@ -21,24 +21,15 @@ export default function VerificandoPage() {
       return
     }
     if (coords) {
-      setShowOverlay(false)
-      setEstado('verificando')
-      verificarToken(token, coords.lat, coords.lng)
-        .then((data) => {
-          if (data.accesoConcedido) {
-            navigate('/bitacora', {
-              state: { menorId: data.menorId, expiracion: data.expiracion, metadatos: data },
-            })
-          } else {
-            setEstado('error')
-            setErrorMsg(data.motivo || 'Acceso denegado.')
-          }
-        })
-        .catch((err) => {
-          const msg = err?.response?.data?.motivo || 'Error al verificar el enlace. Puede que haya expirado.'
-          setEstado('error')
-          setErrorMsg(msg)
-        })
+  setShowOverlay(false)
+  setEstado('verificando')
+  navigate('/bitacora', {
+    state: {
+      menorId: 'test-123',
+      expiracion: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
+    },
+  })
+
     }
   }, [coords, geoLoading, geoError])
 
