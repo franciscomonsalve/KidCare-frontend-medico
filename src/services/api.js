@@ -13,8 +13,9 @@ export async function verificarToken(token, latitudMedico, longitudMedico) {
   return response.data
 }
 
-export async function getBitacora(menorId) {
-  const response = await axios.get(`${CHATBOT_BASE}/interacciones/interno/menor/${menorId}`)
+export async function getBitacora(menorId, observacionIds) {
+  const params = observacionIds?.length ? `?ids=${observacionIds.join(',')}` : ''
+  const response = await axios.get(`${CHATBOT_BASE}/interacciones/interno/menor/${menorId}${params}`)
   const observaciones = (response.data || []).map(obs => ({
     observacionId: obs.id,
     origen: obs.origen,

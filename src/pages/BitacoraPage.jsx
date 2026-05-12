@@ -105,7 +105,7 @@ function PainTrack({ value = 6 }) {
 export default function BitacoraPage() {
   const location = useLocation()
   const navigate  = useNavigate()
-  const { menorId, expiracion, nombreMedico: nombreMedicoNav } = location.state || {}
+  const { menorId, expiracion, nombreMedico: nombreMedicoNav, observacionIds } = location.state || {}
   const { display: timerDisplay, expirado } = useContador(expiracion)
 
   const [bitacora,  setBitacora]  = useState(null)
@@ -117,7 +117,7 @@ export default function BitacoraPage() {
 
   useEffect(() => {
     if (!menorId) return
-    getBitacora(menorId)
+    getBitacora(menorId, observacionIds)
       .then(d => { setBitacora(d); setLoadingB(false) })
       .catch(() => { setBitacora({ observaciones: [] }); setLoadingB(false) })
   }, [menorId])

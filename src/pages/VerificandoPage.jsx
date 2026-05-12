@@ -28,9 +28,10 @@ export default function VerificandoPage() {
           setShowOverlay(false)
           navigate('/bitacora', {
             state: {
-              menorId: data.idMenor,
-              expiracion: data.expiracion,
-              nombreMedico: data.nombreMedico,
+              menorId:       data.idMenor,
+              expiracion:    data.expiracion,
+              nombreMedico:  data.nombreMedico,
+              observacionIds: data.observacionIds ?? null,
             },
           })
         } catch (err) {
