@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -5,35 +7,50 @@
 }
 
 :root {
-  --color-brand:        #4A90D9;
-  --color-brand-dark:   #2F6FAD;
-  --color-brand-light:  #EBF4FF;
-  --color-brand-mid:    #A8D4F5;
+  --bg:         #f0f4f8;
+  --surf:       #ffffff;
+  --surf2:      #f7fafc;
+  --navy:       #0f2d52;
+  --blue:       #1a56db;
+  --blue-l:     #ebf2ff;
+  --teal:       #0891b2;
+  --teal-l:     #ecfeff;
+  --green:      #059669;
+  --green-l:    #ecfdf5;
+  --amber:      #b45309;
+  --amber-l:    #fffbeb;
+  --red:        #dc2626;
+  --red-l:      #fef2f2;
+  --ink:        #0f172a;
+  --ink2:       #1e293b;
+  --ink3:       #475569;
+  --ink4:       #94a3b8;
+  --bdr:        #e2e8f0;
 
-  --color-bg:           #F7F9FC;
-  --color-surface:      #FFFFFF;
-  --color-border:       #E0E8F0;
-  --color-border-soft:  #EDF2F7;
-
-  --color-text-primary:   #2D3748;
-  --color-text-secondary: #718096;
-  --color-text-hint:      #A0AEC0;
-
-  --color-danger:       #E53E3E;
-  --color-danger-light: #FFF5F5;
-  --color-amber:        #D69E2E;
-  --color-amber-light:  #FFFFF0;
-
-  --color-green:        #38A169;
-  --color-green-light:  #F0FFF4;
+  /* legacy aliases used by some components */
+  --color-brand:        #1a56db;
+  --color-brand-dark:   #0f2d52;
+  --color-brand-light:  #ebf2ff;
+  --color-bg:           #f0f4f8;
+  --color-surface:      #ffffff;
+  --color-border:       #e2e8f0;
+  --color-border-soft:  #e2e8f0;
+  --color-text-primary:   #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-hint:      #94a3b8;
+  --color-danger:       #dc2626;
+  --color-danger-light: #fef2f2;
+  --color-green:        #059669;
+  --color-green-light:  #ecfdf5;
 
   --radius-sm:  8px;
   --radius-md:  12px;
-  --radius-lg:  18px;
+  --radius-lg:  16px;
 
-  --shadow-card: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
 
-  --font-sans: 'Nunito', sans-serif;
+  --font-sans:  'DM Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
 }
 
 html, body, #root {
@@ -42,14 +59,14 @@ html, body, #root {
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-bg);
-  color: var(--color-text-primary);
+  background: var(--bg);
+  color: var(--ink);
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-a { color: var(--color-brand); text-decoration: none; }
+a { color: var(--blue); text-decoration: none; }
 button { font-family: var(--font-sans); cursor: pointer; }
 input, textarea { font-family: var(--font-sans); }
 
