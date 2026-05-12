@@ -13,24 +13,34 @@ export default function VerificandoPage() {
   const [showOverlay, setShowOverlay] = useState(true)
 
   useEffect(() => {
-    if (geoLoading) return
-    if (geoError) {
-      setEstado('error')
-      setErrorMsg('No se pudo obtener tu ubicación. El acceso requiere geolocalización activa.')
-      setShowOverlay(false)
-      return
+    const run = async () => {
+      if (geoLoading) return
+      if (geoError) {
+        setEstado('error')
+        setErrorMsg('No se pudo obtener tu ubicación. El acceso requiere geolocalización activa.')
+        setShowOverlay(false)
+        return
+      }
+      if (coords) {
+        try {
+          setEstado('verificando')
+          const data = await verificarToken(token, String(coords.lat), String(coords.lng))
+          setShowOverlay(false)
+          navigate('/bitacora', {
+            state: {
+              menorId: data.idMenor,
+              expiracion: data.expiracion,
+              nombreMedico: data.nombreMedico,
+            },
+          })
+        } catch (err) {
+          setShowOverlay(false)
+          setEstado('error')
+          setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'No se pudo verificar el enlace.')
+        }
+      }
     }
-    if (coords) {
-  setShowOverlay(false)
-  setEstado('verificando')
-  navigate('/bitacora', {
-    state: {
-      menorId: 'test-123',
-      expiracion: new Date(Date.now() + 20 * 60 * 1000).toISOString(),
-    },
-  })
-
-    }
+    run()
   }, [coords, geoLoading, geoError])
 
   return (

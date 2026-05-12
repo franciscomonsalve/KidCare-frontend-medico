@@ -1,22 +1,41 @@
 import axios from 'axios'
 
-const ACCESS_BASE   = 'https://kidcare-access.up.railway.app/api/v1'
-const BITACORA_BASE = 'https://kidcare-bitacora.up.railway.app/api/v1'
-const CHATBOT_BASE  = 'https://kidcare-chatbot.up.railway.app/api/v1'
+const ACCESS_BASE    = import.meta.env.VITE_ACCESS_BASE    || 'http://localhost:8082/api'
+const CHATBOT_BASE   = import.meta.env.VITE_CHATBOT_BASE   || 'http://localhost:8083/api'
+const HISTORIAL_BASE = import.meta.env.VITE_HISTORIAL_BASE || 'http://localhost:8084/api'
 
 export async function verificarToken(token, latitudMedico, longitudMedico) {
-  const response = await axios.get(`${ACCESS_BASE}/acceso/verificar/${token}`, {
-    params: { latitudMedico, longitudMedico },
+  const response = await axios.post(`${ACCESS_BASE}/acceso/medico/verificar`, {
+    token,
+    latitudMedico: String(latitudMedico),
+    longitudMedico: String(longitudMedico),
   })
   return response.data
 }
 
 export async function getBitacora(menorId) {
-  const response = await axios.get(`${BITACORA_BASE}/bitacora/${menorId}`)
-  return response.data
+  const response = await axios.get(`${CHATBOT_BASE}/interacciones/interno/menor/${menorId}`)
+  const observaciones = (response.data || []).map(obs => ({
+    observacionId: obs.id,
+    origen: obs.origen,
+    fecha: obs.fecha,
+    contenido: obs.observaciones,
+    titulo: null,
+    tags: [],
+  }))
+  return { observaciones }
 }
 
 export async function getResumen(menorId) {
-  const response = await axios.get(`${CHATBOT_BASE}/chatbot/${menorId}/resumen`)
-  return response.data
+  try {
+    const response = await axios.get(`${HISTORIAL_BASE}/historial/medico/${menorId}`)
+    const data = response.data
+    return {
+      resumenDisponible: true,
+      resumen: data.resumen,
+      motivo: data.resumen,
+    }
+  } catch {
+    return { resumenDisponible: false, mensaje: 'No hay resumen disponible para este paciente.' }
+  }
 }

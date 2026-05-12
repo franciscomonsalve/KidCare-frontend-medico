@@ -105,10 +105,7 @@ function PainTrack({ value = 6 }) {
 export default function BitacoraPage() {
   const location = useLocation()
   const navigate  = useNavigate()
-  const { menorId, expiracion } = location.state || {
-  menorId: 'test-123',
-  expiracion: new Date(Date.now() + 20 * 60 * 1000).toISOString()
- }
+  const { menorId, expiracion, nombreMedico: nombreMedicoNav } = location.state || {}
   const { display: timerDisplay, expirado } = useContador(expiracion)
 
   const [bitacora,  setBitacora]  = useState(null)
@@ -191,7 +188,7 @@ export default function BitacoraPage() {
           {(bitacora?.nombreTutor || bitacora?.nombreMedico) && (
             <div style={{fontSize:13,color:'rgba(255,255,255,.55)'}}>
               {bitacora.nombreTutor && <>Compartido por <strong style={{color:'rgba(255,255,255,.85)',fontWeight:600}}>{bitacora.nombreTutor} (Tutor)</strong></>}
-              {bitacora.nombreMedico && <> · Para <strong style={{color:'rgba(255,255,255,.85)',fontWeight:600}}>{bitacora.nombreMedico}</strong></>}
+              {(bitacora?.nombreMedico || nombreMedicoNav) && <> · Para <strong style={{color:'rgba(255,255,255,.85)',fontWeight:600}}>{bitacora?.nombreMedico || nombreMedicoNav}</strong></>}
             </div>
           )}
 
@@ -532,7 +529,7 @@ export default function BitacoraPage() {
             </div>
             <div style={{padding:'0 18px'}}>
               {[
-                { icon:'🩺', label:'Médico',         val: bitacora?.nombreMedico || '—' },
+                { icon:'🩺', label:'Médico',         val: bitacora?.nombreMedico || nombreMedicoNav || '—' },
                 { icon:'🕐', label:'Enlace generado', val: bitacora?.horaGenerado || '—' },
                 { icon:'⏱️', label:'Expira a las',    val: formatExpira(expiracion) },
                 { icon:'🔒', label:'Tipo de acceso',  val: 'Solo lectura · Sin registro' },
