@@ -19,10 +19,10 @@ export function parseResumen(texto) {
 
   const MARCADORES = {
     motivo:       /^(motivo\s*de\s*consulta|motivo)\s*[:\-]/i,
-    sintomas:     /^(s[ií]ntomas\s*(registrados)?|s[ií]ntoma)\s*[:\-]/i,
-    evolucion:    /^evoluci[oó]n\s*[:\-]/i,
+    sintomas:     /^(s[ií]ntomas\s*(registrados|principales)?|s[ií]ntoma)\s*[:\-]/i,
+    evolucion:    /^(evoluci[oó]n(\s*temporal)?)\s*[:\-]/i,
     medicacion:   /^medicaci[oó]n(\s*administrada)?\s*[:\-]/i,
-    antecedentes: /^antecedentes\s*[:\-]/i,
+    antecedentes: /^(antecedentes|observaciones\s*adicionales)\s*[:\-]/i,
     escala:       /^escala(\s*de\s*malestar)?\s*[:\-]/i,
   }
 
