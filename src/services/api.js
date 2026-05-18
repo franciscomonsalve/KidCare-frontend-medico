@@ -1,8 +1,15 @@
 import axios from 'axios'
 
-const ACCESS_BASE    = import.meta.env.VITE_ACCESS_BASE    || 'http://localhost:8082/api'
-const CHATBOT_BASE   = import.meta.env.VITE_CHATBOT_BASE   || 'http://localhost:8083/api'
-const HISTORIAL_BASE = import.meta.env.VITE_HISTORIAL_BASE || 'http://localhost:8084/api'
+// Normalise: strip trailing slash then append /api if not already present.
+// This tolerates Railway env vars set with or without the /api suffix.
+function withApi(base) {
+  const b = (base || '').replace(/\/$/, '')
+  return b.endsWith('/api') ? b : b + '/api'
+}
+
+const ACCESS_BASE    = withApi(import.meta.env.VITE_ACCESS_BASE    || 'http://localhost:8082')
+const CHATBOT_BASE   = withApi(import.meta.env.VITE_CHATBOT_BASE   || 'http://localhost:8083')
+const HISTORIAL_BASE = withApi(import.meta.env.VITE_HISTORIAL_BASE || 'http://localhost:8084')
 
 export async function verificarToken(token, latitudMedico, longitudMedico) {
   const response = await axios.post(`${ACCESS_BASE}/acceso/medico/verificar`, {
