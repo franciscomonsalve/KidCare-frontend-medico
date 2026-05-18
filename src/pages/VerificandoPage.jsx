@@ -46,12 +46,14 @@ export default function VerificandoPage() {
           const status = err.response?.status
           const msg = (err.response?.data?.error || err.response?.data?.message || '').toLowerCase()
           let tipoError = 'expired'
-          if (status === 403) {
-            tipoError = (msg.includes('radio') || msg.includes('metros') || msg.includes('km'))
-              ? 'geo'
-              : 'revoked'
-          } else if (status === 404) {
-            tipoError = 'expired'
+          // Determine error type from message content (more reliable than status codes)
+          if (msg.includes('radio') || msg.includes('metros') || msg.includes('km') || msg.includes('rango')) {
+            tipoError = 'geo'
+          } else if (msg.includes('revocado') || msg.includes('revocar')) {
+            tipoError = 'revoked'
+          } else if (status === 403 && !msg) {
+            // 403 without a recognisable message → treat as revoked
+            tipoError = 'revoked'
           }
           navigate('/error', { state: { tipo: tipoError } })
         }
