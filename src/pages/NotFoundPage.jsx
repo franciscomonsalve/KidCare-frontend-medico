@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 const STATES = {
   expired: {
@@ -13,7 +14,7 @@ const STATES = {
     note: <><strong>¿Necesitas acceder?</strong><br />Solicita al tutor del paciente que genere un nuevo enlace desde la app KidCare. Solo puede haber un enlace activo a la vez por paciente.</>,
     glow: 'rgba(245,158,11,.07)',
     badgeStyle: { background: 'rgba(245,158,11,.1)', color: '#fbbf24', border: '1px solid rgba(245,158,11,.18)' },
-    iconStyle: { background: 'rgba(245,158,11,.1)', border: '1.5px solid rgba(245,158,11,.2)' },
+    iconStyle:  { background: 'rgba(245,158,11,.1)', border: '1.5px solid rgba(245,158,11,.2)' },
   },
   revoked: {
     icon: '🚫',
@@ -26,7 +27,7 @@ const STATES = {
     note: <><strong>¿Necesitas el acceso?</strong><br />Contacta directamente al tutor del paciente para que genere un nuevo enlace desde la app KidCare.</>,
     glow: 'rgba(220,38,38,.08)',
     badgeStyle: { background: 'rgba(220,38,38,.1)', color: '#f87171', border: '1px solid rgba(220,38,38,.18)' },
-    iconStyle: { background: 'rgba(220,38,38,.1)', border: '1.5px solid rgba(220,38,38,.2)' },
+    iconStyle:  { background: 'rgba(220,38,38,.1)', border: '1.5px solid rgba(220,38,38,.2)' },
   },
   geo: {
     icon: '📍',
@@ -35,35 +36,39 @@ const STATES = {
     desc: <>Tu dispositivo se encuentra a más de <strong>100 metros</strong> del tutor que generó este enlace.<br />KidCare requiere proximidad física para garantizar que el acceso ocurra <strong>durante la consulta presencial</strong>.</>,
     info: [
       { icon: '✅', label: 'Radio permitido', val: '≤ 100 metros' },
-      { icon: '🔒', label: 'Tu posición', val: 'No fue almacenada' },
+      { icon: '🔒', label: 'Tu posición',    val: 'No fue almacenada' },
     ],
-    note: <><strong>¿Estás en la consulta?</strong><br />Asegúrate de estar físicamente junto al tutor del paciente e intenta de nuevo.</>,
+    note: <><strong>¿Estás en la consulta?</strong><br />Asegúrate de estar físicamente junto al tutor del paciente e intenta de nuevo. Si el problema persiste, solicita al tutor que genere un nuevo enlace.</>,
     glow: 'rgba(99,102,241,.08)',
     badgeStyle: { background: 'rgba(99,102,241,.1)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,.18)' },
-    iconStyle: { background: 'rgba(99,102,241,.1)', border: '1.5px solid rgba(99,102,241,.2)' },
+    iconStyle:  { background: 'rgba(99,102,241,.1)', border: '1.5px solid rgba(99,102,241,.2)' },
   },
 }
 
 export default function NotFoundPage() {
-  const [active, setActive] = useState('expired')
-  const s = STATES[active]
+  const { state } = useLocation()
+  const tipoReal = state?.tipo   // 'expired' | 'revoked' | 'geo' | undefined
+  const modoDemo = !tipoReal     // true = mostrar tabs (ruta * sin estado real)
+
+  const [active, setActive] = useState(tipoReal || 'expired')
+  const s = STATES[active] || STATES.expired
 
   return (
     <div style={{ background: '#080c18', minHeight: '100vh', position: 'relative' }}>
       <style>{`
         @keyframes iconpulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.85;transform:scale(1.03);} }
         @keyframes errIn { from{transform:translateY(22px);opacity:0;} to{transform:none;opacity:1;} }
-        @keyframes spIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
+        @keyframes spIn  { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:none;} }
       `}</style>
 
-      {/* Grid bg */}
+      {/* Grid decorativo */}
       <div style={{
         position: 'fixed', inset: 0, pointerEvents: 'none',
         backgroundImage: 'linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px)',
         backgroundSize: '52px 52px',
       }} />
 
-      {/* Glow */}
+      {/* Glow radial */}
       <div style={{
         position: 'fixed', top: '50%', left: '50%',
         transform: 'translate(-50%,-50%)',
@@ -94,7 +99,7 @@ export default function NotFoundPage() {
         </div>
       </div>
 
-      {/* Center */}
+      {/* Contenido central */}
       <div style={{
         minHeight: 'calc(100vh - 60px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -111,30 +116,32 @@ export default function NotFoundPage() {
           animation: 'errIn .45s cubic-bezier(.16,1,.3,1)',
         }}>
 
-          {/* State tabs */}
-          <div style={{
-            display: 'flex', gap: 5,
-            background: 'rgba(255,255,255,.04)',
-            border: '1px solid rgba(255,255,255,.06)',
-            borderRadius: 12, padding: 4, marginBottom: 36,
-          }}>
-            {Object.keys(STATES).map(key => (
-              <button key={key} onClick={() => setActive(key)} style={{
-                flex: 1, padding: '8px 4px',
-                borderRadius: 8, border: 'none',
-                background: active === key ? 'rgba(255,255,255,.08)' : 'transparent',
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: 11, fontWeight: 600,
-                color: active === key ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.28)',
-                cursor: 'pointer', transition: 'all .2s',
-              }}>
-                {key === 'expired' ? '⏱ Expirado' : key === 'revoked' ? '🚫 Revocado' : '📍 Fuera de rango'}
-              </button>
-            ))}
-          </div>
+          {/* Tabs solo en modo demo */}
+          {modoDemo && (
+            <div style={{
+              display: 'flex', gap: 5,
+              background: 'rgba(255,255,255,.04)',
+              border: '1px solid rgba(255,255,255,.06)',
+              borderRadius: 12, padding: 4, marginBottom: 36,
+            }}>
+              {Object.keys(STATES).map(key => (
+                <button key={key} onClick={() => setActive(key)} style={{
+                  flex: 1, padding: '8px 4px',
+                  borderRadius: 8, border: 'none',
+                  background: active === key ? 'rgba(255,255,255,.08)' : 'transparent',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: 11, fontWeight: 600,
+                  color: active === key ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.28)',
+                  cursor: 'pointer', transition: 'all .2s',
+                }}>
+                  {key === 'expired' ? '⏱ Expirado' : key === 'revoked' ? '🚫 Revocado' : '📍 Fuera de rango'}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div key={active} style={{ animation: 'spIn .3s ease' }}>
-            {/* Icon */}
+            {/* Icono */}
             <div style={{
               width: 86, height: 86, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -151,13 +158,13 @@ export default function NotFoundPage() {
               ...s.badgeStyle,
             }}>{s.badge}</div>
 
-            {/* Title */}
+            {/* Título */}
             <div style={{
               fontFamily: "'Instrument Serif', serif",
               fontSize: 28, color: '#fff', marginBottom: 10, lineHeight: 1.2,
             }}>{s.title}</div>
 
-            {/* Desc */}
+            {/* Descripción */}
             <div style={{
               fontSize: 14, color: 'rgba(255,255,255,.42)',
               lineHeight: 1.75, marginBottom: 28,
@@ -189,7 +196,7 @@ export default function NotFoundPage() {
               ))}
             </div>
 
-            {/* Note */}
+            {/* Nota */}
             <div style={{
               background: 'rgba(255,255,255,.04)',
               border: '1px solid rgba(255,255,255,.07)',
@@ -201,7 +208,7 @@ export default function NotFoundPage() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer fijo */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: 'rgba(8,12,24,.8)', backdropFilter: 'blur(8px)',
@@ -209,7 +216,7 @@ export default function NotFoundPage() {
         padding: '13px 24px', textAlign: 'center',
         fontSize: 11, color: 'rgba(255,255,255,.18)', zIndex: 50,
       }}>
-        KidCare · Sistema de Bitácora de Síntomas Pediátricos<br />
+        KidCare · Sistema de Bitácora de Síntomas Pediátricos · Francisco Monsalve · Benjamín Peña · Génesis Rojas<br />
         Acceso protegido · Ley 19.628 · Ley 21.663
       </div>
     </div>

@@ -7,10 +7,16 @@ const HISTORIAL_BASE = import.meta.env.VITE_HISTORIAL_BASE || 'http://localhost:
 export async function verificarToken(token, latitudMedico, longitudMedico) {
   const response = await axios.post(`${ACCESS_BASE}/acceso/medico/verificar`, {
     token,
-    latitudMedico: String(latitudMedico),
+    latitudMedico:  String(latitudMedico),
     longitudMedico: String(longitudMedico),
   })
   return response.data
+}
+
+function generarTituloCorto(texto) {
+  if (!texto) return null
+  const palabras = texto.trim().split(/\s+/)
+  return palabras.slice(0, 6).join(' ') + (palabras.length > 6 ? '…' : '')
 }
 
 export async function getBitacora(menorId, observacionIds) {
@@ -18,11 +24,11 @@ export async function getBitacora(menorId, observacionIds) {
   const response = await axios.get(`${CHATBOT_BASE}/interacciones/interno/menor/${menorId}${params}`)
   const observaciones = (response.data || []).map(obs => ({
     observacionId: obs.id,
-    origen: obs.origen,
-    fecha: obs.fecha,
-    contenido: obs.observaciones,
-    titulo: null,
-    tags: [],
+    origen:        obs.origen,
+    fecha:         obs.fecha,
+    contenido:     obs.observaciones,
+    titulo:        obs.titulo || generarTituloCorto(obs.observaciones),
+    tags:          obs.tags || [],
   }))
   return { observaciones }
 }
@@ -33,8 +39,8 @@ export async function getResumen(menorId) {
     const data = response.data
     return {
       resumenDisponible: true,
-      resumen: data.resumen,
-      motivo: data.resumen,
+      resumen:           data.resumen,
+      motivo:            data.resumen,
     }
   } catch {
     return { resumenDisponible: false, mensaje: 'No hay resumen disponible para este paciente.' }

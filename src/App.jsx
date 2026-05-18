@@ -9,6 +9,7 @@ export default function App() {
     <Routes>
       <Route path="/acceso/:token" element={<VerificandoPage />} />
       <Route path="/bitacora"      element={<BitacoraPage />} />
+      <Route path="/error"         element={<NotFoundPage />} />
       <Route path="*"              element={<NotFoundPage />} />
     </Routes>
   )

@@ -8,19 +8,21 @@ export default function VerificandoPage() {
   const navigate  = useNavigate()
   const { coords, error: geoError, loading: geoLoading } = useGeolocacion()
 
-  const [estado, setEstado]     = useState('esperando_geo')
-  const [errorMsg, setErrorMsg] = useState('')
+  const [estado, setEstado]         = useState('esperando_geo')
+  const [geoErrorMsg, setGeoErrorMsg] = useState('')
   const [showOverlay, setShowOverlay] = useState(true)
 
   useEffect(() => {
     const run = async () => {
       if (geoLoading) return
+
       if (geoError) {
-        setEstado('error')
-        setErrorMsg('No se pudo obtener tu ubicación. El acceso requiere geolocalización activa.')
+        setEstado('geo_error')
+        setGeoErrorMsg('No se pudo obtener tu ubicación. El acceso requiere geolocalización activa.')
         setShowOverlay(false)
         return
       }
+
       if (coords) {
         try {
           setEstado('verificando')
@@ -28,16 +30,30 @@ export default function VerificandoPage() {
           setShowOverlay(false)
           navigate('/bitacora', {
             state: {
-              menorId:       data.idMenor,
-              expiracion:    data.expiracion,
-              nombreMedico:  data.nombreMedico,
+              menorId:        data.idMenor,
+              expiracion:     data.expiracion,
+              nombreMedico:   data.nombreMedico,
               observacionIds: data.observacionIds ?? null,
+              resumenVerif:   data.resumen ?? null,
+              nombreMenor:    data.nombreMenor ?? null,
+              edadMenor:      data.edadMenor ?? null,
+              nombreTutor:    data.nombreTutor ?? null,
+              horaGenerado:   data.horaGenerado ?? null,
             },
           })
         } catch (err) {
           setShowOverlay(false)
-          setEstado('error')
-          setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'No se pudo verificar el enlace.')
+          const status = err.response?.status
+          const msg = (err.response?.data?.error || err.response?.data?.message || '').toLowerCase()
+          let tipoError = 'expired'
+          if (status === 403) {
+            tipoError = (msg.includes('radio') || msg.includes('metros') || msg.includes('km'))
+              ? 'geo'
+              : 'revoked'
+          } else if (status === 404) {
+            tipoError = 'expired'
+          }
+          navigate('/error', { state: { tipo: tipoError } })
         }
       }
     }
@@ -96,7 +112,7 @@ export default function VerificandoPage() {
               fontSize: 15, fontWeight: 600,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}>
-              📍 Solicitando ubicación…
+              📍 {estado === 'verificando' ? 'Verificando enlace…' : 'Solicitando ubicación…'}
             </div>
             <div style={{ fontSize: 11, color: 'var(--ink4)', marginTop: 10 }}>
               Solo se usa para verificar proximidad · No queda registro de tu posición
@@ -138,7 +154,7 @@ export default function VerificandoPage() {
             </div>
           )}
 
-          {estado === 'error' && (
+          {estado === 'geo_error' && (
             <>
               <div style={{
                 background: '#fef2f2', border: '1px solid #fecaca',
@@ -149,10 +165,12 @@ export default function VerificandoPage() {
                   width: 44, height: 44, background: '#fee2e2', borderRadius: 12,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 22, flexShrink: 0,
-                }}>🔒</div>
+                }}>📍</div>
                 <div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#991b1b', marginBottom: 5 }}>Acceso denegado</div>
-                  <div style={{ fontSize: 13, color: '#b45309', lineHeight: 1.7 }}>{errorMsg}</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: '#991b1b', marginBottom: 5 }}>
+                    Ubicación no disponible
+                  </div>
+                  <div style={{ fontSize: 13, color: '#b45309', lineHeight: 1.7 }}>{geoErrorMsg}</div>
                 </div>
               </div>
               <div style={{
@@ -160,7 +178,7 @@ export default function VerificandoPage() {
                 borderRadius: 13, padding: '14px 16px',
                 fontSize: 13, color: 'var(--ink3)', lineHeight: 1.6,
               }}>
-                Solicita al padre o tutor que genere un nuevo enlace temporal desde la app KidCare.
+                Activa la geolocalización en tu navegador y recarga la página. Si el problema persiste, solicita al tutor que genere un nuevo enlace.
               </div>
             </>
           )}
